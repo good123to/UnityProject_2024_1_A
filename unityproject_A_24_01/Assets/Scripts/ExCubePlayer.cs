@@ -26,7 +26,7 @@ public class ExCubePlayer : MonoBehaviour
         }
 
 
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Power = Random.Range(100, 200);
             m_Rigidbody.AddForce(transform.up * Power);
@@ -52,12 +52,23 @@ public class ExCubePlayer : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log(collision.gameObject.name);
-        Point = 0;
-        gameObject.transform.position = Vector3.zero;
+        Debug.Log(collision.gameObject.tag);
+        if (collision.gameObject.tag == "Pipe")
+        {
+            Point = 0;
+            gameObject.transform.position = Vector3.zero;
+
+        }
+
 
 
     }
-    
-
+    void OnTrigger(Collider other)
+    {
+        if (other.gameObject.tag == "Items")
+        {
+            Point += 10;
+            Destroy(other.gameObject);
+        }
+    }
 }   
