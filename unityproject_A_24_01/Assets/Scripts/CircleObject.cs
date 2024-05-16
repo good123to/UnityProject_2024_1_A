@@ -8,16 +8,23 @@ public class CircleObject : MonoBehaviour
     public bool isDrag;          //마우스 Drag 판단
     public bool isUsed;          //사용 완료 체크
     Rigidbody2D rigidbody2D;     //2D 강체 선언
-    // Start is called before the first frame update
+                                 // Start is called before the first frame update
 
-   
+    public int index;
+
+    private void Awake()
+    {
+        rigidbody2D = GetComponent<Rigidbody2D>();
+        isUsed = false;
+        rigidbody2D.simulated = false;
+    }
 
     void Start()
     {
         isUsed = false;
         rigidbody2D = GetComponent<Rigidbody2D>();
         rigidbody2D.simulated = false;
-        
+
     }
 
     // Update is called once per frame
@@ -26,7 +33,7 @@ public class CircleObject : MonoBehaviour
         if (isUsed)
             return;
 
-        if(isDrag)
+        if (isDrag)
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -58,9 +65,40 @@ public class CircleObject : MonoBehaviour
         rigidbody2D.simulated = true;
 
         GameObject temp = GameObject.FindWithTag("GameManager");
-        if(temp != null)
+        if (temp != null)
         {
             temp.gameObject.GetComponent<GameManager>().GenObject();
+        }
+    }
+    
+    public void Used()
+    {
+        isDrag = false;
+        isUsed = true;
+        rigidbody2D.simulated = true;
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (index >= 7)
+            return;
+        if(collision.gameObject.tag == "Fruit")
+        {
+            CircleObject temp = collision.gameObject.GetComponent<CircleObject>();
+
+            if(temp.index == index)
+            {
+                if(gameObject.GetInstanceID() > collision.gameObject.GetInstanceID())
+                {
+                    GameObject tempGameManager = GameObject.FindWithTag("GameManager");
+                    if (tempGameManager != null)
+                    {
+                        tempGameManager.gameObject.GetComponent<GameManager>().MergeObject(index, gameObject.transform.position);
+                    }
+                    Destroy(temp.gameObject);
+                    Destroy(gameObject);
+                }
+            }
         }
     }
 }
